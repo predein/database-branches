@@ -15,12 +15,18 @@
         <th>ID</th>
         <th>Title</th>
         <th>Content</th>
+        <th>Action</th>
+    </tr>
+    <tr>
+        <td colspan="3">&nbsp;</td>
+        <td><a href="{{ $path }}/items/add/">Create</a></td>
     </tr>
     @foreach($items as $item)
         <tr>
             <td>{{ $item->id }}</td>
             <td>{{ $item->title }}</td>
             <td>{{ $item->content }}</td>
+            <td><a href="{{ $path }}/items/{{ $item->id }}/edit/">Edit</a></td>
         </tr>
     @endforeach
 </table>

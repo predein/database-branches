@@ -6,11 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 trait Scoped
 {
-    /**
-     * Базовое имя таблицы без префикса (обязательно определить в модели).
-     * Пример: 'items'
-     */
-    protected string $baseTable;
+    protected ?string $branchTable = null;
 
     /**
      * Включать ли переключение подключения при наличии branch?
@@ -28,22 +24,26 @@ trait Scoped
      */
     protected bool $disableInConsole = true;
 
-    /**
-     * Возвращает базовое имя без префикса (нужно для from() в query scopes).
-     */
-    public function getBaseTable(): string
-    {
-        return $this->baseTable ?? parent::getTable();
-    }
-
     public function getTable()
     {
         if (!$this->shouldBranch()) {
-            return $this->getBaseTable();
+            return parent::getTable();
         }
 
+        if (!$this->branchTable) {
+            $branchId = Context::id();
+            $this->branchTable = ($branchId ? $branchId . '_' : '') . parent::getTable();
+        }
+        return $this->branchTable;
+    }
+
+    public function setTable($table): static
+    {
         $branchId = Context::id();
-        return ($branchId ? "{$branchId}_" : '') . $this->getBaseTable();
+        if ($branchId && str_starts_with($table, $branchId . '_')) {
+            $table = substr($table, strlen($branchId . '_'));
+        }
+        return parent::setTable($table);
     }
 
     public function getConnectionName()
