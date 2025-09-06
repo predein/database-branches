@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Branch;
 
 Route::get('/', function () {
     $items = App\Models\Item::all();
@@ -18,12 +19,14 @@ Route::get('/add', function () {
     return "Added " . $item->getAttributes()['title'];
 });
 
-Route::get('/branch', function () {
-    $items = App\Models\Item::on('branches')->get()->all();
+Route::get('/branch/123', function () {
+    Branch\Context::put(123);
+    $items = App\Models\Item::all();
     return view('items', ['items' => $items]);
 });
 
-Route::get('/branch/add', function () {
+Route::get('/branch/123/add', function () {
+    Branch\Context::put(123);
     $itemFactory = App\Models\Item::factory();
     $item = $itemFactory->state(
         [
@@ -31,7 +34,6 @@ Route::get('/branch/add', function () {
             'content' => '_content_',
         ],
     )->make();
-    $item->setConnection('branches');
     $item->save();
     return "Added in branch" . $item->getAttributes()['title'];
 });

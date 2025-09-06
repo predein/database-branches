@@ -9,6 +9,7 @@ class Item extends Model
 {
     /** @use HasFactory<\Database\Factories\ItemFactory> */
     use HasFactory;
+    use \App\Branch\Scoped;
 
     protected $fillable = ['title', 'content'];
 }
