@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Branch;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +12,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(\App\Branch\Context::class, fn() => new \App\Branch\Context());
+        $this->app->singleton(Branch\Context::class, fn() => new \App\Branch\Context());
     }
 
     /**

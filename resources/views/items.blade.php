@@ -10,6 +10,10 @@
 
 </head>
 <body>
+
+<a href="{{ url('/switch?branch_id=0') }}">Main</a>
+| <a href="{{ url('/switch?branch_id=123') }}">Branch 123</a>
+
 <table class="table table-striped table-bordered table-hover">
     <tr>
         <th>ID</th>
