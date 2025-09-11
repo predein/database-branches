@@ -15,9 +15,10 @@ Route::get('/switch', function (Request $request) {
 
 Route::get('/', function (Request $request) {
     $branches = App\Models\Branch::query()->latest()->get();
-    Branch\Context::put($request->session()->get('branch_id'));
+    $branch_id = $request->session()->get('branch_id');
+    Branch\Context::put($branch_id);
     $items = App\Models\Item::on(Branch\Context::connectionName())->latest('id')->get();
-    return view('items', ['branches' => $branches, 'items' => $items, 'path' => '']);
+    return view('items', ['branches' => $branches, 'items' => $items, 'branch_id' => $branch_id, 'path' => '']);
 })->name('items.index');
 
 Route::get('/items/add', function (Request $request) {
@@ -42,7 +43,8 @@ Route::post('/items/create', function (Request $request) {
         'title'   => ['required','string','max:255'],
         'content' => ['nullable','string'],
     ]);
-    $item = App\Models\Item::on('mysql')->create($data);
+    $data['id'] = \App\Branch\AutoIncrement::next('items');
+    $item = App\Models\Item::on('mysql')->forceCreate($data);
     return redirect()->route('items.index')->with('status', 'Created ID ' . $item->id);
 })->name('items.create');
 

@@ -4,17 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>Database branches</title>
     <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
     <script src="{{ asset('js/bootstrap.js') }}" defer></script>
 
 </head>
 <body>
 
-<a href="{{ url('/switch?branch_id=0') }}">Main</a>
-@foreach($branches as $branch)
-    | <a href="{{ url('/switch?branch_id=') }}{{$branch->id}}">Branch {{$branch->id}}</a>
-@endforeach
+<nav class="mb-3">
+    <div class="btn-group" role="group">
+        <a href="{{ url('/switch?branch_id=0') }}"
+           class="btn btn-sm {{ ($branch_id ?? 0) == 0 ? 'btn-primary' : 'btn-outline-primary' }}">Main</a>
+        @foreach($branches as $branch)
+            <a href="{{ url('/switch?branch_id='.$branch->id) }}"
+               class="btn btn-sm {{ ($branch_id ?? 0) == $branch->id ? 'btn-primary' : 'btn-outline-secondary' }}">Branch {{ $branch->id }}</a>
+        @endforeach
+    </div>
+</nav>
 
 <table class="table table-striped table-bordered table-hover">
     <tr>
