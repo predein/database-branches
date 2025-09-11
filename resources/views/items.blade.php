@@ -12,7 +12,9 @@
 <body>
 
 <a href="{{ url('/switch?branch_id=0') }}">Main</a>
-| <a href="{{ url('/switch?branch_id=123') }}">Branch 123</a>
+@foreach($branches as $branch)
+    | <a href="{{ url('/switch?branch_id=') }}{{$branch->id}}">Branch {{$branch->id}}</a>
+@endforeach
 
 <table class="table table-striped table-bordered table-hover">
     <tr>

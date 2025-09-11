@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Item>
  */
-class ItemFactory extends Factory
+class BranchFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,8 +17,7 @@ class ItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => $this->faker->words(2, true),
-            'content' => $this->faker->words(3, true),
+            'status' => 1,
         ];
     }
 }

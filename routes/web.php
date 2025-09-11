@@ -14,9 +14,10 @@ Route::get('/switch', function (Request $request) {
 });
 
 Route::get('/', function (Request $request) {
+    $branches = App\Models\Branch::query()->latest()->get();
     Branch\Context::put($request->session()->get('branch_id'));
     $items = App\Models\Item::on(Branch\Context::connectionName())->latest('id')->get();
-    return view('items', ['items' => $items, 'path' => '']);
+    return view('items', ['branches' => $branches, 'items' => $items, 'path' => '']);
 })->name('items.index');
 
 Route::get('/items/add', function (Request $request) {
