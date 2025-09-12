@@ -8,7 +8,7 @@ class AutoIncrement
 {
     public static function next(string $table): int
     {
-        $row = BranchAutoIncrement::forTable('items');
+        $row = BranchAutoIncrement::forTable($table);
         $row->increment('auto_increment');
         return $row->auto_increment;
     }

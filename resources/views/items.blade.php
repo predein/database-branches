@@ -13,12 +13,14 @@
 
 <nav class="mb-3">
     <div class="btn-group" role="group">
-        <a href="{{ url('/switch?branch_id=0') }}"
+        <a href="{{ url('/branch/switch?branch_id=0') }}"
            class="btn btn-sm {{ ($branch_id ?? 0) == 0 ? 'btn-primary' : 'btn-outline-primary' }}">Main</a>
         @foreach($branches as $branch)
-            <a href="{{ url('/switch?branch_id='.$branch->id) }}"
+            <a href="{{ url('/branch/switch?branch_id='.$branch->id) }}"
                class="btn btn-sm {{ ($branch_id ?? 0) == $branch->id ? 'btn-primary' : 'btn-outline-secondary' }}">Branch {{ $branch->id }}</a>
         @endforeach
+        <a href="{{ url('/branch/create') }}"
+           class="btn btn-sm btn-outline-primary">Create</a>
     </div>
 </nav>
 

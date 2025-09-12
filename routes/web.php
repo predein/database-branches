@@ -5,12 +5,29 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Http\Request;
 use App\Branch;
 
-Route::get('/switch', function (Request $request) {
+Route::get('/branch/switch', function (Request $request) {
     $branch_id = $request->query('branch_id');
     if ($branch_id !== null) {
         $request->session()->put('branch_id', (int)$branch_id);
     }
     return redirect()->back(fallback: '/');
+});
+
+Route::get('/branch/create', function (Request $request) {
+    $branch = App\Models\Branch::query()->create(['status' => 0]);
+    Branch\Job::dispatch($branch->id);
+    return view(
+        'wait',
+        [
+            'status_url' => URL::to('/branch/'.$branch->id.'/status'),
+            'redirect_url' => URL::route('items.index'),
+        ],
+    );
+});
+
+Route::get('/branch/{id}/status', function (int $id) {
+    $branch = \App\Models\Branch::query()->findOrFail($id);
+    return response()->json(['id' => $branch->id, 'status' => (int) $branch->status]);
 });
 
 Route::get('/', function (Request $request) {
@@ -44,13 +61,13 @@ Route::post('/items/create', function (Request $request) {
         'content' => ['nullable','string'],
     ]);
     $data['id'] = \App\Branch\AutoIncrement::next('items');
-    $item = App\Models\Item::on('mysql')->forceCreate($data);
+    $item = App\Models\Item::on(Branch\Context::connectionName())->forceCreate($data);
     return redirect()->route('items.index')->with('status', 'Created ID ' . $item->id);
 })->name('items.create');
 
 Route::get('/items/{id}/edit', function (Request $request, int $id) {
     Branch\Context::put($request->session()->get('branch_id'));
-    $item = App\Models\Item::on('mysql')->findOrFail($id);
+    $item = App\Models\Item::on(Branch\Context::connectionName())->findOrFail($id);
     $action = URL::route('items.update', ['id' => $item->id]);
     $csrf   = csrf_token();
     $title = e($item->title);
@@ -75,7 +92,7 @@ Route::post('/items/{id}', function (Request $request, int $id) {
         'content' => ['nullable','string'],
     ]);
 
-    $item = App\Models\Item::on('mysql')->findOrFail($id);
+    $item = App\Models\Item::on(Branch\Context::connectionName())->findOrFail($id);
     $item->fill($data)->save();
 
     return redirect()->route('items.index')->with('status', 'Updated ID ' . $item->id);
