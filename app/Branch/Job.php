@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 
 class Job implements ShouldQueue
 {
@@ -17,17 +18,30 @@ class Job implements ShouldQueue
 
     public function handle(): void
     {
-
         Context::put($this->branchId);
 
-        // create tables
-        \App\Models\Item::on(Context::connectionName())->fromQuery("CREATE TABLE branches_db." . $this->branchId . "_items LIKE laravel.items"); // @todo
+        // detect all Models with trait \App\Branch\Scoped
+        $tables = [
+            'items',
+        ];
 
-        // copy data
-        // ...
+        foreach ($tables as $table) {
+            $branch_table = 'branches_db.' . $this->branchId . '_' . $table;
+            $original_table = 'laravel.' . $table;
+            DB::statement("CREATE TABLE ? LIKE ?", [$branch_table, $original_table]);
+        }
 
-        // create triggers for change logs
-        // ...
+        DB::transaction(function () use ($tables) {
+            foreach ($tables as $table) {
+                $branch_table = 'branches_db.' . $this->branchId . '_' . $table;
+                $original_table = 'laravel.' . $table;
+                DB::statement("SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO'");
+                DB::statement("INSERT INTO ? SELECT * FROM ?", [$branch_table, $original_table]);
+
+                // create triggers for change logs
+                // ...
+            }
+        });
 
         Branch::query()->whereKey($this->branchId)->update(['status' => 1]);
     }
